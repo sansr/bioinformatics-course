@@ -1,3 +1,5 @@
+import sys
+
 def PatternCount(pattern, text):
     count = 0
     for i in range(len(text)-len(pattern)+1):
@@ -21,3 +23,19 @@ def FrequentWords(Text, k):
             FrequentPatterns.append(Text[i:i+k])
     return list(set(FrequentPatterns))
 
+def ReverseComplement(Text):
+    complements = {'A':'T', 'C':'G', 'G':'C', 'T':'A'}
+    rText = reversed(Text)
+    rcomplement = ''
+    for n in rText:
+        rcomplement += complements[n]
+    return rcomplement
+
+def PatternMatching(pattern, genome):
+    indices = set()
+    offset = 0
+    i = genome.find(pattern, offset)
+    while i >= 0:
+        indices.add(str(i))
+        i = genome.find(pattern, i+1)
+    return indices
