@@ -1,4 +1,4 @@
-def patternCount(pattern, text):
+def PatternCount(pattern, text):
     count = 0
     for i in range(len(text)-len(pattern)+1):
         if text[i:i+len(pattern)] == pattern:
@@ -11,4 +11,13 @@ def CountDict(Text, k):
         Pattern = Text[i:i+k]
         Count[i] = PatternCount(Pattern, Text)
     return Count
+
+def FrequentWords(Text, k):
+    FrequentPatterns = []
+    Count = CountDict(Text, k)
+    m = max(Count.values())
+    for i in Count:
+        if Count[i] == m:
+            FrequentPatterns.append(Text[i:i+k])
+    return list(set(FrequentPatterns))
 
