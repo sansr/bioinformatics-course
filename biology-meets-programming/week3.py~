@@ -1,0 +1,165 @@
+import sys
+import random
+from collections import defaultdict
+
+def count(motifs):
+    columns = [''.join(seq) for seq in zip(*motifs)]
+    return [[c.count(nucleotide) for c in columns] for nucleotide in 'ACGT']
+
+def profile(motifs):
+    matrix = count(motifs)
+    nrows = len(motifs)
+    return [[col/nrows for col in row] for row in matrix]
+
+# def consensus(motifs):
+#     columns = [''.join(seq) for seq in zip(*motifs)]
+#     return [max([(nucleotide, c.count(nucleotide)) for nucleotide in 'ACGT'],lambda x: x[1]) for c in columns]
+
+def consensus(motifs):
+    countM = count(motifs)
+    k_mer = len(motifs[0])
+    consensus = ""
+
+    for j in range(k_mer):
+        m = 0
+        frequentSymbol = ""
+        for k,v in countM.items():
+            if v[j] > m:
+                m = v[j]
+                frequentSymbol = k
+        consensus += frequentSymbol
+    
+    return consensus
+
+def score(motifs):
+    '''Returns the score of the given list of motifs.'''
+    columns = [''.join(seq) for seq in zip(*motifs)]
+    max_count = sum([max([c.count(nucleotide) for nucleotide in 'ACGT']) for c in columns])
+
+    return len(motifs[0])*len(motifs) - max_count
+
+def pr(text, profile):
+    p = 1
+    #profile = [[float(item) for item in row.split()] for row in profile]
+    #dprofile = convert_to_dict(profile)
+
+    for i in range(len(text)):
+        p = p*profile[text[i]][i]
+
+    return p
+
+def profile_most_probable_pattern(text, k, profile):
+    maxPr = 0
+    most_probable_kmer = ''
+    
+    for i in range(len(text)-k+1):
+        kmer = text[i:i+k]
+        prob = pr(kmer, profile)
+        if prob > maxPr:
+            maxPr = prob
+            most_probable_kmer = kmer
+
+    return most_probable_kmer
+
+def greedy_motif_search(dna, k, t):
+    bestMotifs = []
+    # Add the first kmer as the best motif
+    for i in range(t):
+        bestMotifs.append(dna[i][0:k])
+
+    for i in range(len(dna[0])-k+1):
+        motifs = [dna[0][i:i+k]]
+        for j in range(1, t):
+            p = profile(motifs[0:j])
+            motifs.append(profile_most_probable_pattern(dna[j], k, p))
+        if score(motifs) < score(bestMotifs):
+            bestMotifs = motifs
+
+    return bestMotifs
+
+def convert_to_dict(matrix):
+    dmatrix = {'A':matrix[0], 'C':matrix[1], 'G':matrix[2], 'T':matrix[3]}
+    return dmatrix
+
+### WEEK 4 ###
+
+def count_with_pseudocounts(motifs):
+    columns = [''.join(seq) for seq in zip(*motifs)]
+    return [[c.count(nucleotide)+1 for c in columns] for nucleotide in 'ACGT']
+
+def compute_col_det(motifs):
+    dets = []
+    columns = [''.join(seq) for seq in zip(*motifs)]
+    for nucleotide in 'ACGT':
+        det = 0
+        for c in columns:
+            det += c.count(nucleotide)
+        dets.append(det)
+
+    return dets
+            
+    
+def profile_with_pseudocounts(motifs):
+    matrix = count_with_pseudocounts(motifs)
+    nrows = len(motifs)+4
+    return [[col/nrows for col in row] for i, row in enumerate(matrix)]
+
+def greedy_motif_search_pseudocounts(dna, k, t):
+    bestMotifs = []
+    # Add the first kmer as the best motif
+    for i in range(t):
+        bestMotifs.append(dna[i][0:k])
+
+    for i in range(len(dna[0])-k+1):
+        motifs = [dna[0][i:i+k]]
+        for j in range(1, t):
+            p = profile_with_pseudocounts(motifs[0:j])
+            motifs.append(profile_most_probable_pattern(dna[j], k, p))
+        if score(motifs) < score(bestMotifs):
+            bestMotifs = motifs
+
+    return bestMotifs
+
+def motifs(profile, dna):
+    motifs = []
+    k = len(profile[0])
+    for row in dna:
+        motifs.append(profile_most_probable_pattern(row, k, profile))
+
+    return motifs
+
+def random_motifs(dna, k, t):
+    rMotifs = []
+    for row in range(0,t):
+        rn = random.randint(1, len(dna[row]))
+        rMotifs.append(dna[row][rn:rn+k])
+
+    return rMotifs
+
+def randomized_motif_search(dna, k, t):
+    bestMotifs = random_motifs(dna, k, t)
+    while True:
+        profile = profile_with_pseudocounts(bestMotifs)
+        motifs = Motifs(profile, dna)
+        if score(motifs) < score(bestMotifs):
+            bestMotifs = motifs
+        else:
+            return bestMotifs
+
+## Gibbs sampling
+
+def Normalize(Probabilities):
+    sum = 0
+    for k,v in Probabilities.items():
+        sum += v
+    
+    return {k:v/sum for k,v in Probabilities.items()}
+
+
+lines = sys.stdin.read().splitlines()
+print(convert_to_dict(profile_with_pseudocounts(lines)))
+
+    
+    
+    
+    

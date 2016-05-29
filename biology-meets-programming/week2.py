@@ -1,3 +1,5 @@
+## Module with functions implemented for week2 exercises of the course ##
+
 from week1 import PatternCount
 import sys
 

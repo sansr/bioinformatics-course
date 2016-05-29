@@ -1,4 +1,4 @@
-import sys
+## Module with functions implemented for week1 exercises of the course ##
 
 def PatternCount(Pattern, Genome):
     """Returns the number of times a pattern appears in Genome"""
