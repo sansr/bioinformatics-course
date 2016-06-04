@@ -21,10 +21,11 @@ def overlap_graph(reads):
     graph = filter(check_overlap, pairs)
     return graph
 
-def deBruijin_graph(k, sequence):
-    """Compute the de Bruijing graph from a sequence and a k given. In the de Bruijin graph the edges represente the reads and the nodes are overlaps between this reads"""
+def deBruijn_graph(k, sequence):
+    """Compute the de Bruijn graph from a sequence and a k given. In the de Bruijn graph the edges represente the reads and the nodes are overlaps between this reads"""
     graph = {}
-    edges = list([sequence[i:i+k] for i in range(len(sequence)-k+1)])
+    edges = [sequence[i:i+k] for i in range(len(sequence)-k+1)]
+    print(edges)
     for edge in edges:
         frm = edge[:-1]
         to = edge[1:]
@@ -35,7 +36,7 @@ def deBruijin_graph(k, sequence):
 
     return graph
 
-def deBruijin_graph_from_edges(edges):
+def deBruijn_graph_from_edges(edges):
     """Compute the de Bruijing graph from a number os edges given. In the de Bruijin graph the edges represent the reads and the nodes are overlapsbetween this reads"""
     graph = {}
     for edge in edges:
