@@ -1,4 +1,5 @@
 from week1 import deBruijn_graph_from_edges
+from itertools import product
 
 def cycle(edges, current_node):
     path = [current_node]
@@ -93,6 +94,17 @@ def string_reconstruction(k, reads):
 
         return result
 
+def universal_string(k):
+    universal_dict = {}
+    for kmer in [''.join(item) for item in product('01', repeat=k)]:
+        if kmer[:-1] in universal_dict:
+            universal_dict[kmer[:-1]].append(kmer[1:])
+        else:
+            universal_dict[kmer[:-1]] = [kmer[1:]]
+
+    path = EulerianCycle(universal_dict)
+    return ''.join([item[0] for item in path[:-1]])
+
 if __name__ == "__main__":
     import sys
 
@@ -128,10 +140,13 @@ if __name__ == "__main__":
         # print('->'.join(EulerPath))
 
         ### String reconstruction problem ###
+        # k = int(lines[0])
+        # reads = lines[1:]
+        # assembled = string_reconstruction(k, reads)
+        # print "".join(assembled)
+
+        ### Universal string problem ###
         k = int(lines[0])
-        reads = lines[1:]
-        assembled = string_reconstruction(k, reads)
-        print "".join(assembled)
-        
+        print(universal_string(k))
 
             
